@@ -17,7 +17,7 @@
 # - GET loan duration
 # - SET loan duration to months
 # - Calculate  monthly_payment
-# - PRINT monthly_payment and loan duration in months.
+# - P monthly_payment and loan duration in months.
 
 def prompt(message)
   Kernel.puts("=> #{message}")
@@ -69,16 +69,17 @@ loop do
   annual_interest_rate = annual_interest_rate.to_f / 100
   loan_duration = loan_duration.to_i
   monthly_interest_rate = annual_interest_rate / 12
-  loan_duration_in_months = loan_duration * 12
+  months = loan_duration * 12
 
   # Formula
   monthly_payment = loan_amount *
-                    (monthly_interest_rate / (1 - (1 + monthly_interest_rate)**(-loan_duration_in_months)))
+                    (monthly_interest_rate /
+                    (1 - (1 + monthly_interest_rate)**-months))
 
-  total_cost = loan_duration_in_months * monthly_payment
+  total_cost = months * monthly_payment
 
-  prompt("Your monthly payment is #{monthly_payment.round(2)}\n
-    for a duration of #{loan_duration_in_months} months or\n
+  prompt("Your monthly payment is $#{monthly_payment.round(2)}\n
+    for a duration of #{months} months or\n
     #{loan_duration} years. The total cost of your loan is\n
     $#{total_cost.round(2)}")
 
