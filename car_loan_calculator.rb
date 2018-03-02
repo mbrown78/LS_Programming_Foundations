@@ -31,9 +31,18 @@ def float?(input)
   input.to_f.to_s == input
 end
 
-def valid_number?(input)
-  integer?(input) || float?(input)
+def valid_amount?(input)
+  input.to_i > 0 && integer?(input) || float?(input)
 end
+
+def valid_interest_rate?(input)
+  input.to_i >= 0 && integer?(input) || float?(input)
+end
+
+def valid_duration?(input)
+  input.to_i > 0 && integer?(input) || float?(input)
+end
+
 loop do
   prompt('Welcome to the Car Loan Calculator! Please enter your loan amount')
 
@@ -41,7 +50,7 @@ loop do
 
   loop do
     loan_amount = Kernel.gets.chomp
-    break if integer?(loan_amount)
+    break if valid_amount?(loan_amount)
     prompt('Hmmm.... that doesnt look like a valid number')
   end
 
@@ -51,17 +60,17 @@ loop do
 
   loop do
     annual_interest_rate = Kernel.gets.chomp
-    break if valid_number?(annual_interest_rate)
+    break if valid_interest_rate?(annual_interest_rate)
     prompt('Hmmm.... that doesnt look like a valid number')
   end
 
-  prompt('What is the loan duration?')
+  prompt('What is the loan duration in years?')
 
   loan_duration = ''
 
   loop do
     loan_duration = Kernel.gets.chomp
-    break if valid_number?(loan_duration)
+    break if valid_duration?(loan_duration)
     prompt('Hmmm.... that doesnt look like a valid number')
   end
 
