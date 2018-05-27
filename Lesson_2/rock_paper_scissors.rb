@@ -83,11 +83,6 @@ loop do
     choice_score = 0
   end
 
-  # reset score method that didnt work
-  # if choice_score || computer_score == 5
-  #   reset_score(choice_score, computer_score)
-  # end
-
   prompt('Do you want to play again?')
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?('y')

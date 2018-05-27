@@ -9,6 +9,7 @@ end
 
 my_string = "pumpkins"
 my_array = ["pumpkins"]
+
 # reassigning the values on line 14 to the return value of the method
 my_string, my_array = not_so_tricky_method(my_string, my_array)
 

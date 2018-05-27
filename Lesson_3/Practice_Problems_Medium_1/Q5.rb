@@ -1,7 +1,7 @@
 
 # the problem is limit is defined outside of the method. Methods do not have access to any local variables defined outside of their scope
 
-# you can either pass the limit as an additional argument or instialize
+# you can either pass the limit as an additional argument or intialize
 # the variable within the method itself
 def fib(first_num, second_num)
   limit = 15
