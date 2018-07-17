@@ -45,7 +45,7 @@ def empty_square(brd)
   # will return an array of integers that represent the empty squares.
 end
 
-# modification to Array#join used in `person_places_piece!`
+# modification to Array#join used in `player_places_piece!`
 def joinor(arr, delimiter=', ', word='or')
   case arr.size
   when 0 then ''
@@ -62,7 +62,7 @@ def player_places_piece!(brd)
   square = ''
   loop do
     prompt "Choose a position to place a piece:
-           #{joinor(empty_square(brd), ', ')}"
+           #{joiner(empty_square(brd), ', ')}"
     square = gets.chomp.to_i
     break if empty_square(brd).include?(square)
     prompt "Sorry, that's not a valid choice."
@@ -125,7 +125,6 @@ def keep_score!(brd, scores)
   end
 end
 
-# improve method take result of declare Winner to boolean form
 def reset_score!(scores)
   if scores[:player] == 5 || scores[:computer] == 5
     scores[:player] = 0
