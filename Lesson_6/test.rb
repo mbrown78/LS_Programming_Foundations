@@ -1,15 +1,39 @@
-a = [["Spades", "Q"], ["Spades", 3]]
-b = [["Diamonds", 9], ["Hearts", 8]]
 
-def joiner(arr, delimiter=', ', word='and')
-  case arr.size
-  when 1 then arr[0][1]
-  when 2 then arr[0][1] + " and " + arr[1][1]
+
+def calculate_ace(total, number_of_aces)
+  ace_value = 0
+  if number_of_aces >= 2 && total < 10
+    p  11 + ((number_of_aces - 1) * 1)
+  elsif total > 10
+    ace_value +=  1
   else
-    cards = arr.map { |sub_a| sub_a[1]}
-    cards[-1] = "#{word} #{cards.last}"
-    cards.join(delimiter)
-  end
+    ace_value += 11
+ end
+ ace_value
 end
 
-p joiner(a)
+p calculate_ace(8,2)
+
+
+
+
+# how many values == 'A'
+
+ #[{:suit=>"Spades", :value=>"5"}]
+ #[{:suit=>"Spades", :value=>"5"}, {:suit=>"Spades", :value=>"2"}]
+
+=begin
+values = ["A", '2', '3', '4', '5', '6', '7', '8', '9', '10', "J", "Q", "K"]
+suits = ["Hearts", "Spades", "Clubs", "Diamonds"]
+deck = []
+
+hash = {}
+count = 0
+
+suits.each do |suit|
+  values.size.times do |i |
+    p values[i]
+    p suit
+    hash[suit] = values[i]
+end
+=end
