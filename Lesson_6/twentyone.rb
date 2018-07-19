@@ -190,7 +190,7 @@ loop do
   dealer_total = 0
 
   if player[:score] == 0 && dealer[:score] == 0
-    prompt "Welcome to the game 'Whatever-One.' The aim of the game"
+    prompt "Welcome to the game 'Whatever-One.' ßThe aim of the game"
     prompt "is to get as close to 'Whatever-number' without going over."
     prompt "You can chose to hit to receive a new card or stay."
     prompt "The numbers 2 through 10 are worth their face value."
@@ -217,7 +217,7 @@ loop do
       player_cards << deal_card(deck)
       dealer_cards << deal_card(deck) if dealer_total < DEALER_CAP
       display_cards(player_cards, dealer_cards)
-    end # end of player loop
+    end
 
     if busted?(player_total) || busted?(dealer_total)
       p "#{who_busted(player_cards)} busted."
@@ -234,7 +234,7 @@ loop do
     update_score(player, dealer, player_total, dealer_total)
     display_score(player, dealer)
     break
-  end # second game loop
+  end
 
   if game_over?(player, dealer)
     display_overall_score(player)
