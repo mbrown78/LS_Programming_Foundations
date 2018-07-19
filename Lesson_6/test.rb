@@ -1,39 +1,39 @@
-
-
-def calculate_ace(total, number_of_aces)
-  ace_value = 0
-  if number_of_aces >= 2 && total < 10
-    p  11 + ((number_of_aces - 1) * 1)
-  elsif total > 10
-    ace_value +=  1
+require 'pry'
+def result(players_total, dealer_total)
+  if players_total > 21
+    'player_busted'
+  elsif dealer_total > 21
+    'dealer_busted'
+  elsif dealer_total > players_total
+    'dealer'
+  elsif players_total > dealer_total
+    'player'
   else
-    ace_value += 11
- end
- ace_value
+    'tie'
+  end
 end
 
-p calculate_ace(8,2)
-
-
-
-
-# how many values == 'A'
-
- #[{:suit=>"Spades", :value=>"5"}]
- #[{:suit=>"Spades", :value=>"5"}, {:suit=>"Spades", :value=>"2"}]
-
-=begin
-values = ["A", '2', '3', '4', '5', '6', '7', '8', '9', '10', "J", "Q", "K"]
-suits = ["Hearts", "Spades", "Clubs", "Diamonds"]
-deck = []
-
-hash = {}
-count = 0
-
-suits.each do |suit|
-  values.size.times do |i |
-    p values[i]
-    p suit
-    hash[suit] = values[i]
+def update_score(player, dealer, players_total, dealer_total)
+   winner = result(players_total, dealer_total)
+    if winner == 'player' || winner == 'dealer_busted'
+      player[:score] += 1
+    elsif winner == 'dealer' || winner == 'player_busted'
+      dealer[:score] += 1
+    end
 end
-=end
+
+player = {
+  score: 0
+}
+
+dealer = {
+  score: 0
+}
+
+players_total = 20
+dealer_total = 21
+
+ result(players_total, dealer_total)
+ p update_score(player, dealer, players_total, dealer_total)
+ p "#{player}player"
+ p "#{dealer}dealer"

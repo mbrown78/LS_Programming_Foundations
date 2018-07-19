@@ -1,3 +1,5 @@
+require 'pry'
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -84,11 +86,11 @@ def calculate_ace(total, number_of_aces)
   ace_value
 end
 
-def calculate_total(players_cards)
+def calculate_total(player_cards)
   total = 0
-  number_of_aces = how_many_aces(players_cards)
+  number_of_aces = how_many_aces(player_cards)
 
-  players_cards.each do |card|
+  player_cards.each do |card|
     total += if standard_card?(card)
                card[:value].to_i
              elsif face_card?(card)
@@ -100,79 +102,139 @@ def calculate_total(players_cards)
   total
 end
 
-def busted?(card_hand)
-  total = calculate_total(card_hand)
-  total > 21
+def busted?(user_total)
+  user_total > 21
+end
+
+def who_won(player_cards, dealer_cards)
+  total_dealer = 21 - calculate_total(dealer_cards)
+  total_player = 21 - calculate_total(player_cards)
+  total_dealer > total_player ? "Player" : "Dealer"
 end
 
 def who_busted(player_cards)
   calculate_total(player_cards) > 21 ? "You" : "Dealer"
 end
 
-def who_won(players_cards, dealer_cards)
-  total_dealer = 21 - calculate_total(dealer_cards)
-  total_player = 21 - calculate_total(players_cards)
-  total_dealer > total_player ? "Player" : "Dealer"
+def result(player_total, dealer_total)
+  if player_total > 21
+    :player_busted
+  elsif dealer_total > 21
+    :dealer_busted
+  elsif dealer_total > player_total
+    :dealer
+  elsif player_total > dealer_total
+    :player
+  else
+    :tie
+  end
 end
 
-def display_end_results(players_cards, dealer_cards)
+def update_score(player, dealer, player_total, dealer_total)
+   winner = result(player_total, dealer_total)
+    if winner == :player || winner == :dealer_busted
+      player[:score] += 1
+    elsif winner == :dealer || winner == :player_busted
+      dealer[:score] += 1
+    end
+end
+
+def display_overall_score(player, dealer)
+    if player[:score] == 5
+      p "Congratulations you won"
+    else
+      p "Better luck next time"
+    end
+end
+
+def display_score(player, dealer)
+   p "Your score is #{player[:score]}. Dealer score is #{dealer[:score]}. "
+end
+
+def game_over?(player, dealer)
+   player[:score] == 5 || dealer[:score] == 5
+end
+
+player = {
+  score: 0
+}
+
+dealer = {
+  score: 0
+}
+
+def display_round_results(player_cards, dealer_cards)
   p "                                     "
   p "------------------------------------"
   p " ** ***      Game Over       *** ** "
-  p "         The #{who_won(players_cards, dealer_cards)} won!"
+  p "         The #{who_won(player_cards, dealer_cards)} won!"
   p "                                    "
-  p "Player Total : #{calculate_total(players_cards)}"
+  p "Player Total : #{calculate_total(player_cards)}"
   p "Dealer Total : #{calculate_total(dealer_cards)}"
 end
 
-loop do
-  loop do
-    system 'clear'
+loop do #main loop
+  deck = initialize_deck
+  player_cards = [deal_card(deck)]
+  dealer_cards = [deal_card(deck)]
+  player_total = 0
+  dealer_total = 0
+
+  if player[:score] == 0 && dealer[:score] == 0
     prompt "Welcome to the game 'Twenty One.' The aim of the game"
     prompt "is to get as prompt close to 21 without going over."
     prompt "You can chose to hit to receive a new card or stay."
     prompt "The numbers 2 through 10 are worth their face value."
     prompt "The jack, queen, and king are each worth 10, and the ace"
     prompt "can be worth 1 or 11"
+    p "                                           "
+  end
+  display_first_hand(player_cards, dealer_cards)
 
-    deck = initialize_deck
-    players_cards = [deal_card(deck)]
-    dealer_cards = [deal_card(deck)]
-    display_first_hand(players_cards, dealer_cards)
+  loop do
 
-    loop do
-      break if busted?(dealer_cards) || busted?(players_cards)
-      players_choice = ''
+    loop do #player turn
+      player_total = calculate_total(player_cards)
+      dealer_total = calculate_total(dealer_cards)
+      break if busted?(dealer_total) || busted?(player_total)
+      player_choice = ''
       loop do
         prompt "Please Choose 'hit' or 'stay'!"
-        players_choice = gets.chomp
-        break if valid_choice?(players_choice)
+        player_choice = gets.chomp
+        break if valid_choice?(player_choice)
         prompt('Hmmm.... that doesnt look like a valid choice')
       end
       system 'clear'
-      break if players_choice == 'stay' || busted?(players_cards)
-      players_cards << deal_card(deck)
-      dealer_cards << deal_card(deck) if calculate_total(dealer_cards) < 17
-      display_cards(players_cards, dealer_cards)
+      break if player_choice == 'stay' || busted?(player_total)
+      player_cards << deal_card(deck)
+      dealer_cards << deal_card(deck) if dealer_total < 17
+      display_cards(player_cards, dealer_cards)
+    end # end of player loop
+
+    if busted?(player_total) || busted?(dealer_total)
+      p "#{who_busted(player_cards)} busted."
+    else
+      p "You chose to stay!"
+      loop do
+          break if busted?(dealer_total) || dealer_total >= 17
+          dealer_cards << deal_card(deck) if dealer_total < 17
+          dealer_total = calculate_total(dealer_cards)
+      end
     end
 
-    if busted?(players_cards) || busted?(dealer_cards)
-      p"#{who_busted(players_cards)} busted."
-      break
-    else
-      puts "You chose to stay!"
-      loop do
-        break if busted?(dealer_cards) || calculate_total(dealer_cards) >= 17
-        dealer_cards << deal_card(deck) if calculate_total(dealer_cards) < 17
-      end
-      display_end_results(players_cards, dealer_cards)
-    end
+    display_round_results(player_cards, dealer_cards)
+    update_score(player, dealer, player_total, dealer_total)
+    display_score(player, dealer)
     break
+  end # second game loop
+
+  if game_over?(player, dealer)
+    prompt "Do you want to play again?"
+    answer = gets.chomp
+    break unless answer.downcase.start_with?('y')
+    dealer[:score] = 0
+    player[:score] = 0
   end
-  p "                          "
-  prompt "Do you want to play again?"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
-end
+end #end of main loop
 
 p "Thank you for playing "
