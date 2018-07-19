@@ -1,5 +1,8 @@
 require 'pry'
 
+WINNING_VALUE = 27
+DEALER_CAP = WINNING_VALUE - 4
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -103,23 +106,29 @@ def calculate_total(player_cards)
 end
 
 def busted?(user_total)
-  user_total > 21
+  user_total > WINNING_VALUE
 end
 
-def who_won(player_cards, dealer_cards)
-  total_dealer = 21 - calculate_total(dealer_cards)
-  total_player = 21 - calculate_total(player_cards)
-  total_dealer > total_player ? "Player" : "Dealer"
+def who_won(player_total, dealer_total)
+  who = result(player_total, dealer_total)
+  case who
+  when :player_busted then 'The dealer won'
+  when :dealer_busted then 'The player won'
+  when :dealer        then 'The dealer won'
+  when :player        then 'The player won'
+  else
+    "It's a Tie"
+  end
 end
 
 def who_busted(player_cards)
-  calculate_total(player_cards) > 21 ? "You" : "Dealer"
+  calculate_total(player_cards) > WINNING_VALUE ? "You" : "Dealer"
 end
 
 def result(player_total, dealer_total)
-  if player_total > 21
+  if player_total > WINNING_VALUE
     :player_busted
-  elsif dealer_total > 21
+  elsif dealer_total > WINNING_VALUE
     :dealer_busted
   elsif dealer_total > player_total
     :dealer
@@ -131,28 +140,28 @@ def result(player_total, dealer_total)
 end
 
 def update_score(player, dealer, player_total, dealer_total)
-   winner = result(player_total, dealer_total)
-    if winner == :player || winner == :dealer_busted
-      player[:score] += 1
-    elsif winner == :dealer || winner == :player_busted
-      dealer[:score] += 1
-    end
+  winner = result(player_total, dealer_total)
+  if winner == :player || winner == :dealer_busted
+    player[:score] += 1
+  elsif winner == :dealer || winner == :player_busted
+    dealer[:score] += 1
+  end
 end
 
-def display_overall_score(player, dealer)
-    if player[:score] == 5
-      p "Congratulations you won"
-    else
-      p "Better luck next time"
-    end
+def display_overall_score(player)
+  if player[:score] == 5
+    p "Congratulations you won"
+  else
+    p "Better luck next time"
+  end
 end
 
 def display_score(player, dealer)
-   p "Your score is #{player[:score]}. Dealer score is #{dealer[:score]}. "
+  p "Your score is #{player[:score]}. Dealer score is #{dealer[:score]}. "
 end
 
 def game_over?(player, dealer)
-   player[:score] == 5 || dealer[:score] == 5
+  player[:score] == 5 || dealer[:score] == 5
 end
 
 player = {
@@ -163,17 +172,17 @@ dealer = {
   score: 0
 }
 
-def display_round_results(player_cards, dealer_cards)
+def display_round_results(player_total, dealer_total)
   p "                                     "
   p "------------------------------------"
   p " ** ***      Game Over       *** ** "
-  p "         The #{who_won(player_cards, dealer_cards)} won!"
+  p "         #{who_won(player_total, dealer_total)}!"
   p "                                    "
-  p "Player Total : #{calculate_total(player_cards)}"
-  p "Dealer Total : #{calculate_total(dealer_cards)}"
+  p "Player Total : #{player_total}"
+  p "Dealer Total : #{dealer_total}"
 end
 
-loop do #main loop
+loop do
   deck = initialize_deck
   player_cards = [deal_card(deck)]
   dealer_cards = [deal_card(deck)]
@@ -181,19 +190,18 @@ loop do #main loop
   dealer_total = 0
 
   if player[:score] == 0 && dealer[:score] == 0
-    prompt "Welcome to the game 'Twenty One.' The aim of the game"
-    prompt "is to get as prompt close to 21 without going over."
+    prompt "Welcome to the game 'Whatever-One.' The aim of the game"
+    prompt "is to get as close to 'Whatever-number' without going over."
     prompt "You can chose to hit to receive a new card or stay."
     prompt "The numbers 2 through 10 are worth their face value."
     prompt "The jack, queen, and king are each worth 10, and the ace"
-    prompt "can be worth 1 or 11"
+    prompt "can be worth 1 or 11. Your number is 27"
     p "                                           "
   end
   display_first_hand(player_cards, dealer_cards)
 
   loop do
-
-    loop do #player turn
+    loop do
       player_total = calculate_total(player_cards)
       dealer_total = calculate_total(dealer_cards)
       break if busted?(dealer_total) || busted?(player_total)
@@ -207,7 +215,7 @@ loop do #main loop
       system 'clear'
       break if player_choice == 'stay' || busted?(player_total)
       player_cards << deal_card(deck)
-      dealer_cards << deal_card(deck) if dealer_total < 17
+      dealer_cards << deal_card(deck) if dealer_total < DEALER_CAP
       display_cards(player_cards, dealer_cards)
     end # end of player loop
 
@@ -216,25 +224,26 @@ loop do #main loop
     else
       p "You chose to stay!"
       loop do
-          break if busted?(dealer_total) || dealer_total >= 17
-          dealer_cards << deal_card(deck) if dealer_total < 17
-          dealer_total = calculate_total(dealer_cards)
+        break if busted?(dealer_total) || dealer_total >= DEALER_CAP
+        dealer_cards << deal_card(deck) if dealer_total < DEALER_CAP
+        dealer_total = calculate_total(dealer_cards)
       end
     end
 
-    display_round_results(player_cards, dealer_cards)
+    display_round_results(player_total, dealer_total)
     update_score(player, dealer, player_total, dealer_total)
     display_score(player, dealer)
     break
   end # second game loop
 
   if game_over?(player, dealer)
+    display_overall_score(player)
     prompt "Do you want to play again?"
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
     dealer[:score] = 0
     player[:score] = 0
   end
-end #end of main loop
+end
 
 p "Thank you for playing "

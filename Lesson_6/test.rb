@@ -1,39 +1,33 @@
-require 'pry'
-def result(players_total, dealer_total)
-  if players_total > 21
-    'player_busted'
-  elsif dealer_total > 21
-    'dealer_busted'
-  elsif dealer_total > players_total
-    'dealer'
-  elsif players_total > dealer_total
-    'player'
+WINNING_VALUE = 27
+
+player_total = 38
+dealer_total = 48
+
+def who_won(player_total, dealer_total)
+  who = result(player_total, dealer_total)
+  case who
+  when :player_busted then 'dealer won'
+  when :dealer_busted then 'player won'
+  when :dealer        then 'dealer won'
+  when :player        then 'player won'
   else
-    'tie'
+    "It's a Tie"
   end
 end
 
-def update_score(player, dealer, players_total, dealer_total)
-   winner = result(players_total, dealer_total)
-    if winner == 'player' || winner == 'dealer_busted'
-      player[:score] += 1
-    elsif winner == 'dealer' || winner == 'player_busted'
-      dealer[:score] += 1
-    end
+def result(player_total, dealer_total)
+  if player_total > WINNING_VALUE
+    :player_busted
+  elsif dealer_total > WINNING_VALUE
+    :dealer_busted
+  elsif dealer_total > player_total
+    :dealer
+  elsif player_total > dealer_total
+    :player
+  else
+    :tie
+  end
 end
 
-player = {
-  score: 0
-}
-
-dealer = {
-  score: 0
-}
-
-players_total = 20
-dealer_total = 21
-
- result(players_total, dealer_total)
- p update_score(player, dealer, players_total, dealer_total)
- p "#{player}player"
- p "#{dealer}dealer"
+p result(player_total, dealer_total)
+p who_won(player_total, dealer_total)

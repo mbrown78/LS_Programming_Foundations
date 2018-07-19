@@ -29,11 +29,6 @@ def display_results(player, computer)
   end
 end
 
-# def reset_score(score1, score2)
-#  score1 = 0
-#  score2 = 0
-# end
-
 choice_score = 0
 computer_score = 0
 prompt('Welcome to the game first to 5 wins!')
