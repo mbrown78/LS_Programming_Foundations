@@ -144,8 +144,7 @@ def result(player_total, dealer_total)
   end
 end
 
-def update_score(player, dealer, player_total, dealer_total)
-  winner = result(player_total, dealer_total)
+def update_score(player, dealer, winner)
   if winner == :player || winner == :dealer_busted
     player[:score] += 1
   elsif winner == :dealer || winner == :player_busted
@@ -155,9 +154,13 @@ end
 
 def display_overall_score(player)
   if player[:score] == POINTS
-    p "Congratulations you won"
+    p "      ------------------------------      "
+    p "                                          "
+    p "    *** Congratulations you won! ***      "
   else
-    p "Better luck next time"
+    p "                                          "
+    p "                                          "
+    p " *** Game Over. Better luck next time *** "
   end
 end
 
@@ -185,7 +188,7 @@ dealer = {
 def display_round_results(player_total, dealer_total)
   p "                                     "
   p "------------------------------------"
-  p " ** ***      Game Over       *** ** "
+  p " ** ***      Round Over       *** ** "
   p "         #{who_won(player_total, dealer_total)}!"
   p "                                    "
   p "Player Total : #{player_total}"
@@ -198,7 +201,7 @@ def display_start_game_msg
   prompt "You can chose to hit to receive a new card or stay."
   prompt "The numbers 2 through 10 are worth their face value."
   prompt "The jack, queen, and king are each worth 10, and the ace"
-  prompt "can be worth 1 or 11. First to 5 points wins the game."
+  prompt "can be worth 1 or 11. First to #{POINTS} points wins the game."
   prompt "Your number is 27"
   p "                                           "
 end
@@ -210,9 +213,12 @@ loop do
   player_total = 0
   dealer_total = 0
 
+  system 'clear'
+
   if player[:score] == 0 && dealer[:score] == 0
     display_start_game_msg
   end
+
   display_first_hand(player_cards, dealer_cards)
 
   loop do
@@ -246,19 +252,24 @@ loop do
     end
 
     display_round_results(player_total, dealer_total)
-    update_score(player, dealer, player_total, dealer_total)
+    winner = result(player_total, dealer_total)
+    update_score(player, dealer, winner)
     display_score(player, dealer)
-    loop do
-      prompt "Hit 'n' for next round...."
-      player_choice = gets.chomp
-      break if valid_choice_next_round?(player_choice)
-      prompt('Hmmm.... that doesnt look like a valid choice')
+
+    if !game_over?(player, dealer)
+      loop do
+        prompt "Hit 'n' for next round...."
+        player_choice = gets.chomp
+        break if valid_choice_next_round?(player_choice)
+        prompt('Hmmm.... that doesnt look like a valid choice')
+      end
     end
     break
   end
 
   if game_over?(player, dealer)
     display_overall_score(player)
+    p "                               "
     prompt "Do you want to play again?"
     prompt "Hit 'y' for 'yes' or any other key to exit."
     answer = gets.chomp
