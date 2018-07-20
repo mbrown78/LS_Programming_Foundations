@@ -1,33 +1,21 @@
-WINNING_VALUE = 27
 
-player_total = 38
-dealer_total = 48
 
-def who_won(player_total, dealer_total)
-  who = result(player_total, dealer_total)
-  case who
-  when :player_busted then 'dealer won'
-  when :dealer_busted then 'player won'
-  when :dealer        then 'dealer won'
-  when :player        then 'player won'
-  else
-    "It's a Tie"
-  end
+player = {
+  score: 2
+}
+
+dealer = {
+  score: 5
+}
+
+def reset_score(player, dealer)
+  dealer[:score] = 0
+  player[:score] = 0
 end
 
-def result(player_total, dealer_total)
-  if player_total > WINNING_VALUE
-    :player_busted
-  elsif dealer_total > WINNING_VALUE
-    :dealer_busted
-  elsif dealer_total > player_total
-    :dealer
-  elsif player_total > dealer_total
-    :player
-  else
-    :tie
-  end
-end
+p player
+p dealer 
 
-p result(player_total, dealer_total)
-p who_won(player_total, dealer_total)
+p reset_score(player, dealer)
+p player
+p dealer

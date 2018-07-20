@@ -1,5 +1,6 @@
 require 'pry'
 
+POINTS = 5
 WINNING_VALUE = 27
 DEALER_CAP = WINNING_VALUE - 4
 
@@ -9,6 +10,10 @@ end
 
 def valid_choice?(choice)
   choice.downcase == 'hit' || choice.downcase == 'stay'
+end
+
+def valid_choice_next_round?(choice)
+  choice.downcase == 'n'
 end
 
 def initialize_deck
@@ -149,7 +154,7 @@ def update_score(player, dealer, player_total, dealer_total)
 end
 
 def display_overall_score(player)
-  if player[:score] == 5
+  if player[:score] == POINTS
     p "Congratulations you won"
   else
     p "Better luck next time"
@@ -161,7 +166,12 @@ def display_score(player, dealer)
 end
 
 def game_over?(player, dealer)
-  player[:score] == 5 || dealer[:score] == 5
+  player[:score] == POINTS || dealer[:score] == POINTS
+end
+
+def reset_score(player, dealer)
+  dealer[:score] = 0
+  player[:score] = 0
 end
 
 player = {
@@ -182,6 +192,17 @@ def display_round_results(player_total, dealer_total)
   p "Dealer Total : #{dealer_total}"
 end
 
+def display_start_game_msg
+  prompt "Welcome to the game 'Whatever-One.' ßThe aim of the game"
+  prompt "is to get as close to 'Whatever-number' without going over."
+  prompt "You can chose to hit to receive a new card or stay."
+  prompt "The numbers 2 through 10 are worth their face value."
+  prompt "The jack, queen, and king are each worth 10, and the ace"
+  prompt "can be worth 1 or 11. First to 5 points wins the game."
+  prompt "Your number is 27"
+  p "                                           "
+end
+
 loop do
   deck = initialize_deck
   player_cards = [deal_card(deck)]
@@ -190,13 +211,7 @@ loop do
   dealer_total = 0
 
   if player[:score] == 0 && dealer[:score] == 0
-    prompt "Welcome to the game 'Whatever-One.' ßThe aim of the game"
-    prompt "is to get as close to 'Whatever-number' without going over."
-    prompt "You can chose to hit to receive a new card or stay."
-    prompt "The numbers 2 through 10 are worth their face value."
-    prompt "The jack, queen, and king are each worth 10, and the ace"
-    prompt "can be worth 1 or 11. Your number is 27"
-    p "                                           "
+    display_start_game_msg
   end
   display_first_hand(player_cards, dealer_cards)
 
@@ -233,16 +248,22 @@ loop do
     display_round_results(player_total, dealer_total)
     update_score(player, dealer, player_total, dealer_total)
     display_score(player, dealer)
+    loop do
+      prompt "Hit 'n' for next round...."
+      player_choice = gets.chomp
+      break if valid_choice_next_round?(player_choice)
+      prompt('Hmmm.... that doesnt look like a valid choice')
+    end
     break
   end
 
   if game_over?(player, dealer)
     display_overall_score(player)
     prompt "Do you want to play again?"
+    prompt "Hit 'y' for 'yes' or any other key to exit."
     answer = gets.chomp
     break unless answer.downcase.start_with?('y')
-    dealer[:score] = 0
-    player[:score] = 0
+    reset_score(player, dealer)
   end
 end
 
